@@ -6,8 +6,7 @@ import java.util.Scanner;
 
 public class Documents {
     
-    
-    public void addDocuments(){
+   public void addDocuments(){
         
          
         Scanner sc = new Scanner(System.in);
@@ -154,13 +153,8 @@ public class Documents {
     
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
 }
+     
+    
+    
+

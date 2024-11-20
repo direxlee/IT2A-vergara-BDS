@@ -7,62 +7,52 @@ import java.util.Scanner;
 public class Citizen {
     
     
-    public void addCitizen(){
-        
+    public void addCitizen() {
         Scanner sc = new Scanner(System.in);
         Config cfg = new Config();
-        
+
         System.out.print("Enter Citizen First Name: ");
-        String cname = sc.next();
+        String firstName = sc.next();
         System.out.print("Enter Citizen Last Name: ");
-        String cname1 = sc.next();
-        System.out.print("Gender: ");
-        String gender = sc.next();
-        System.out.print("Age: ");
-        int age = sc.nextInt();
-        sc.nextLine();
-        System.out.print("Address: ");
+        String lastName = sc.next();
+        sc.nextLine(); // Consume newline
+        System.out.print("Enter Address: ");
         String address = sc.nextLine();
-        System.out.print("Phone Number: ");
-        String num = sc.next();
-        System.out.print("Email: ");
-        String email = sc.next();
-        
-        String citizen = "INSERT INTO Citizens(First_Name, Last_Name, Gender, Age, Address, Phone_Number, Email) VALUES (?,?,?,?,?,?,?)";
-        cfg.addCitizen(citizen, cname, cname1, gender, age, address,num, email);
+        System.out.print("Enter Phone Number: ");
+        String phoneNumber = sc.next();
+
+        String sql = "INSERT INTO Citizens (First_Name, Last_Name, Address, Phone_Number) VALUES (?, ?, ?, ?)";
+        cfg.addCitizen(sql, firstName, lastName, address, phoneNumber);
     }
-    public void viewCitizen(){
-        
-        
-         String qry = "SELECT * FROM Citizens";
-        String[] hdrs = {"Citizen ID", "First Name", "Last Name", "Gender", "Age", "Address","Phone Number", "Email"};
-        String[] clmns = {"Citizen_ID", "First_Name", "Last_Name", "Gender", "Age", "Address", "Phone_Number", "Email"};
-        
-     Config cfg = new Config();
-        cfg.viewCitizen(qry, hdrs, clmns);
+
+    public void viewCitizen() {
+        String query = "SELECT * FROM Citizens";
+        String[] headers = {"Citizen ID", "First Name", "Last Name", "Address", "Phone Number"};
+        String[] columns = {"Citizen_ID", "First_Name", "Last_Name", "Address", "Phone_Number"};
+
+        Config cfg = new Config();
+        cfg.viewCitizen(query, headers, columns);
     }
-    
-    public void mainCitizen(){
-        
-          Citizen ct = new Citizen();
-          Scanner sc = new Scanner(System.in);
-          Config cfg = new Config();
-        
-        String res;
-        do{
-        System.out.println("=====================================");
-    System.out.println("          Citizen Management         ");
-    System.out.println("=====================================");
-    System.out.println("1. Add Citizen");
-    System.out.println("2. View Citizens");
-    System.out.println("3. Update Citizen");
-    System.out.println("4. Delete Citizen");
-    System.out.println("5. Exit");
-    System.out.println("=====================================");
-    System.out.print("Please select an option (1-5): ");
-        
-         int choice;
-         while (true) {
+
+    public void mainCitizen() {
+        Scanner sc = new Scanner(System.in);
+        Config cfg = new Config();
+        boolean continueLoop = true;
+
+        do {
+            System.out.println("=====================================");
+            System.out.println("          Citizen Management         ");
+            System.out.println("=====================================");
+            System.out.println("1. Add Citizen");
+            System.out.println("2. View Citizens");
+            System.out.println("3. Update Citizen");
+            System.out.println("4. Delete Citizen");
+            System.out.println("5. Exit");
+            System.out.println("=====================================");
+            System.out.print("Please select an option (1-5): ");
+
+            int choice;
+            while (true) {
                 System.out.print("Enter choice: ");
                 if (sc.hasNextInt()) {
                     choice = sc.nextInt();
@@ -76,85 +66,47 @@ public class Citizen {
                     sc.next();
                 }
             }
-        
-         switch(choice){
-             
-             case 1:
-                 ct.addCitizen();
-                 break;
-             case 2:
-                 ct.viewCitizen();
-                 break;
-             case 3:
-                                  ct.viewCitizen();
 
-                 String dels = "UPDATE Citizens SET Age = ?, Address = ?, Phone_Number = ?, Email  = ? WHERE Citizen_ID = ?";
-                 
-                 
-         int dels1;
-                while (true) {
-                System.out.print("Enter Citizen ID to update: ");
-                if (sc.hasNextInt()) {
-                    dels1 = sc.nextInt();
-                    if (cfg.getSingleValues("SELECT Citizen_ID  FROM Citizens  WHERE Citizen_ID = ?", dels1) != 0) {
-                        break;
+            switch (choice) {
+                case 1:
+                    addCitizen();
+                    break;
+                case 2:
+                    viewCitizen();
+                    break;
+                case 3:
+                    viewCitizen();
+                    System.out.print("Enter Citizen ID to update: ");
+                    int updateId = sc.nextInt();
+                    if (cfg.getSingleValues("SELECT Citizen_ID FROM Citizens WHERE Citizen_ID = ?", updateId) != 0) {
+                        sc.nextLine(); // Consume newline
+                        System.out.print("Enter new Address: ");
+                        String newAddress = sc.nextLine();
+                        System.out.print("Enter new Phone Number: ");
+                        String newPhoneNumber = sc.next();
+                        String updateQuery = "UPDATE Citizens SET Address = ?, Phone_Number = ? WHERE Citizen_ID = ?";
+                        cfg.updateCitizen(updateQuery, newAddress, newPhoneNumber, updateId);
                     } else {
-                        System.out.println("Selected Citizen doesn't exist.");
+                        System.out.println("Citizen ID not found.");
                     }
-                } else {
-                    System.out.println("Invalid input. Please enter a integer Citizen ID.");
-                    sc.next(); 
-                }
+                    break;
+                case 4:
+                    viewCitizen();
+                    System.out.print("Enter Citizen ID to delete: ");
+                    int deleteId = sc.nextInt();
+                    if (cfg.getSingleValues("SELECT Citizen_ID FROM Citizens WHERE Citizen_ID = ?", deleteId) != 0) {
+                        String deleteQuery = "DELETE FROM Citizens WHERE Citizen_ID = ?";
+                        cfg.deleteCitizen(deleteQuery, deleteId);
+                    } else {
+                        System.out.println("Citizen ID not found.");
+                    }
+                    break;
+                case 5:
+                    continueLoop = false;
+                    break;
             }
-                 System.out.print("Enter new Age: ");
-                 int newage = sc.nextInt();
-                 System.out.print("Enter new Address: ");
-                 String newadds = sc.next();
-                 System.out.print("Enter new Phone Number: ");
-                 String newnum = sc.next();
-                 System.out.print("Enter new Email: ");
-                 String newem = sc.next();
-                 
-                 cfg.updateCitizen(dels, newage, newadds, newnum, newem,dels1);
-                 break;
-             case 4:
-                                  ct.viewCitizen();
+        } while (continueLoop);
 
-                 String dlete = "DELETE FROM Citizens WHERE Citizen_ID = ?";
-                 
-               
-                 
-                        
-         int delete;
-                while (true) {
-                System.out.print("Enter Citizen ID to delete: ");
-                if (sc.hasNextInt()) {
-                    delete = sc.nextInt();
-                    if (cfg.getSingleValues("SELECT Citizen_ID  FROM Citizens  WHERE Citizen_ID = ?", delete) != 0) {
-                        break;
-                    } else {
-                        System.out.println("Selected Citizen doesn't exist.");
-                    }
-                } else {
-                    System.out.println("Invalid input. Please enter a integer Citizen ID.");
-                    sc.next(); 
-                }
-            }
-                 
-                 
-                 cfg.deleteCitizen(dlete, delete);
-                 break;
-             case 5:
-                 System.out.println("Exiting......................../");
-                 break;
-         }
-         System.out.println("");
-         System.out.print("Do you want to continue? Yes or No: ");
-         res = sc.next();
-    }while(res.equalsIgnoreCase("yes"));
-        
+        System.out.println("Exiting Citizen Management...");
     }
-    
-    
-    
 }
